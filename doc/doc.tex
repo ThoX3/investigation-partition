@@ -1,0 +1,514 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{longtable}
+
+\geometry{margin=1in}
+
+\title{Go Project Documentation}
+\author{Kalash Abdulaziz, Yahya Chikar, Antony Huynh, Maelys Sable, Yam Pakzad}
+\date{\today}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Disk \\ Partition Utilities}
+\lhead{GoLang Docs}
+\rfoot{\thepage}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  pdftitle={Disk and Partition Utilities Documentation},
+  pdfauthor={ChatGPT},
+  pdfkeywords={Go, Disk, Partition, Documentation},
+}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Disk Utilities (disk.go)}
+
+\subsection*{Function: \texttt{GetDisksInfoJSON}}
+\textbf{Description:} Returns a JSON string describing each detected physical disk and its capacity in gigabytes.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} None
+  \item \textbf{Returns:}
+  \begin{itemize}
+    \item \texttt{string} — JSON string of disk information
+    \item \texttt{error} — if disk data collection fails
+  \end{itemize}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{getPhysicalDisks}}
+\textbf{Description:} Identifies physical disk devices by filtering partitions and removing duplicates or virtual devices.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} None
+  \item \textbf{Returns:}
+  \begin{itemize}
+    \item \texttt{[]string} — list of disk device names
+    \item \texttt{error} — if partition scanning fails
+  \end{itemize}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{getDiskCapacity}}
+\textbf{Description:} Detects the operating system and delegates disk capacity retrieval to an appropriate function.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:}
+  \begin{itemize}
+    \item \texttt{diskName (string)} — device name
+  \end{itemize}
+  \item \textbf{Returns:}
+  \begin{itemize}
+    \item \texttt{uint64} — disk capacity in bytes
+    \item \texttt{error} — if detection fails
+  \end{itemize}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{getLinuxDiskCapacity}}
+\textbf{Description:} Gets disk capacity on Linux using the \texttt{lsblk} command.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{diskName (string)}
+  \item \textbf{Returns:} \texttt{(uint64, error)}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{getWindowsDiskCapacity}}
+\textbf{Description:} Uses WMIC to get disk size on Windows.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{diskName (string)}
+  \item \textbf{Returns:} \texttt{(uint64, error)}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{getMacOSDiskCapacity}}
+\textbf{Description:} Uses macOS \texttt{diskutil} to retrieve total disk size.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{diskName (string)}
+  \item \textbf{Returns:} \texttt{(uint64, error)}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{trimLastDigit}}
+\textbf{Description:} Removes trailing digits from a disk device name.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{diskName (string)}
+  \item \textbf{Returns:} \texttt{string}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{isWSL}}
+\textbf{Description:} Checks whether the program is running inside Windows Subsystem for Linux (WSL).
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} None
+  \item \textbf{Returns:} \texttt{bool}
+\end{itemize}
+\hrule\vspace{2em}
+
+\newpage
+
+\section{Partition Utilities (partition.go)}
+
+\subsection*{Function: \texttt{mountPartition}}
+\textbf{Description:} Mounts a partition to a specified mount point using a specific filesystem.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:}
+  \begin{itemize}
+    \item \texttt{device (string)} — device path
+    \item \texttt{mountPoint (string)} — mount directory
+    \item \texttt{fstype (string)} — file system type
+  \end{itemize}
+  \item \textbf{Returns:} \texttt{error}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{unmountPartition}}
+\textbf{Description:} Unmounts the given partition from the filesystem.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{device (string)}
+  \item \textbf{Returns:} \texttt{error}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{GetMountPoint}}
+\textbf{Description:} Determines a valid mount base directory from predefined paths.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Returns:} \texttt{string}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{removeDevPrefix}}
+\textbf{Description:} Strips the /dev prefix from a device path.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{name (string)}
+  \item \textbf{Returns:} \texttt{string}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{ensureLeadingSlash}}
+\textbf{Description:} Ensures a string begins with a leading slash.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{s (string)}
+  \item \textbf{Returns:} \texttt{string}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{MountUnmountedPartitions}}
+\textbf{Description:} Automatically mounts any unmounted partitions of a given disk.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{diskName (string)}
+  \item \textbf{Returns:} \texttt{error}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{GetPartitionsInfo}}
+\textbf{Description:} Uses lsblk to retrieve partition info for a given disk.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{diskName (string)}
+  \item \textbf{Returns:} \texttt{([]PartitionInfo, error)}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{formatPartitionInfo}}
+\textbf{Description:} Converts lsblk JSON output into the internal PartitionInfo struct.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{dev (LsblkDevice)}
+  \item \textbf{Returns:} \texttt{PartitionInfo}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{GetPartitionsForDiskJSON}}
+\textbf{Description:} Returns all partition info for a disk in JSON format, mounting any that are unmounted.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{diskName (string)}
+  \item \textbf{Returns:} \texttt{(string, error)}
+\end{itemize}
+
+
+
+
+\newpage
+
+\section{File Utilities (file.go)}
+
+\subsection*{Function: \texttt{getMountPoint}}
+\textbf{Description:} Finds the mount point associated with a specific partition device.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{partition (string)}
+  \item \textbf{Returns:}
+  \begin{itemize}
+    \item \texttt{string} — mount point path
+    \item \texttt{error} — if not found or access fails
+  \end{itemize}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{getFileInfo}}
+\textbf{Description:} Gathers detailed metadata for a given file or directory entry.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:}
+  \begin{itemize}
+    \item \texttt{path (string)} — full path to the file
+    \item \texttt{entry (os.DirEntry)} — directory entry object
+  \end{itemize}
+  \item \textbf{Returns:}
+  \begin{itemize}
+    \item \texttt{FileInfo} — struct with metadata
+    \item \texttt{error} — if info lookup fails
+  \end{itemize}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{AddTrailingSlash}}
+\textbf{Description:} Appends a trailing slash to a string if not already present.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{path (string)}
+  \item \textbf{Returns:} \texttt{string}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{AddSlash}}
+\textbf{Description:} Ensures that a string begins with a slash.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{s (string)}
+  \item \textbf{Returns:} \texttt{string}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{RemoveDoubleSlashes}}
+\textbf{Description:} Replaces repeated double slashes with a single slash in a path.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{s (string)}
+  \item \textbf{Returns:} \texttt{string}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{listRootFiles}}
+\textbf{Description:} Lists and returns JSON metadata of all files in a given directory path relative to a mount point.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:}
+  \begin{itemize}
+    \item \texttt{mountPath (string)} — base mount path
+    \item \texttt{path (string)} — relative path inside mount
+  \end{itemize}
+  \item \textbf{Returns:}
+  \begin{itemize}
+    \item \texttt{string} — JSON-encoded list of file info
+    \item \texttt{error} — if reading or formatting fails
+  \end{itemize}
+\end{itemize}
+\hrule\vspace{2em}
+
+
+\newpage
+
+
+\section{Block Utilities (block.go)}
+
+\subsection*{Function: \texttt{ReadBlock}}
+\textbf{Description:} Reads a specific 512-byte block from a file and returns its contents as a hexadecimal string.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:}
+  \begin{itemize}
+    \item \texttt{file (*os.File)} — open file pointer
+    \item \texttt{blockNumber (int)} — index of the block to read
+  \end{itemize}
+  \item \textbf{Returns:}
+  \begin{itemize}
+    \item \texttt{string} — hex representation of block contents
+    \item \texttt{error} — if file seeking or reading fails
+  \end{itemize}
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Function: \texttt{GenerateJSON}}
+\textbf{Description:} Reads an entire file in 512-byte blocks and returns a JSON object mapping block indices to hex data.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:} \texttt{filePath (string)} — path to the input file
+  \item \textbf{Returns:}
+  \begin{itemize}
+    \item \texttt{string} — JSON string of all file blocks in hex
+    \item \texttt{error} — if reading or marshaling fails
+  \end{itemize}
+\end{itemize}
+\hrule\vspace{2em}
+
+\newpage
+
+\section{Filter Utilities (filter.go)}
+
+\subsection*{Function: \texttt{FilterFilesByName}}
+\textbf{Description:} Filters a list of files from a JSON input based on whether the filename contains a specified substring (case-insensitive).
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:}
+  \begin{itemize}
+    \item \texttt{jsonData ([]byte)} — JSON-encoded data representing a list of files
+    \item \texttt{filter (string)} — the substring to filter filenames by
+  \end{itemize}
+  \item \textbf{Returns:}
+  \begin{itemize}
+    \item \texttt{[]byte} — JSON-encoded data of filtered file list
+    \item \texttt{error} — if decoding or encoding fails
+  \end{itemize}
+\end{itemize}
+\hrule\vspace{2em}
+
+\section{Utility Functions (utils.go)}
+
+\subsection*{Function: \texttt{roundFloat}}
+\textbf{Description:} Rounds a floating-point number to a given number of decimal places.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Parameters:}
+  \begin{itemize}
+    \item \texttt{value (float64)} — the number to round
+    \item \texttt{precision (int)} — number of decimal places
+  \end{itemize}
+  \item \textbf{Returns:} \texttt{float64} — rounded float value
+\end{itemize}
+\hrule\vspace{2em}
+
+
+\newpage
+
+\section{API Endpoints (api.go)}
+
+\subsection*{Endpoint: \texttt{GET /disks}}
+\textbf{Description:} Returns a list of all physical disks with their capacity in JSON format.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Query Parameters:} None
+  \item \textbf{Returns:} JSON object with disk information or an error message
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Endpoint: \texttt{GET /partitions}}
+\textbf{Description:} Returns partition information for a specified disk in JSON format.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Query Parameters:}
+  \begin{itemize}
+    \item \texttt{disk (string)} — required disk identifier
+  \end{itemize}
+  \item \textbf{Returns:} JSON object of partitions or an error message
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Endpoint: \texttt{GET /files}}
+\textbf{Description:} Lists all files in the given path of a mounted partition, with optional filtering.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Query Parameters:}
+  \begin{itemize}
+    \item \texttt{partition (string)} — required partition identifier
+    \item \texttt{path (string)} — optional relative path inside mount
+    \item \texttt{filter (string)} — optional name filter for files
+  \end{itemize}
+  \item \textbf{Returns:} JSON array of file metadata, optionally filtered by name
+\end{itemize}
+\hrule\vspace{1em}
+
+\subsection*{Endpoint: \texttt{GET /blocks}}
+\textbf{Description:} Reads the file content in blocks from a mounted partition and returns it as a JSON map of block indexes to hex strings.
+\begin{itemize}[leftmargin=2cm,label={--}]
+  \item \textbf{Query Parameters:}
+  \begin{itemize}
+    \item \texttt{partition (string)} — required partition identifier
+    \item \texttt{path (string)} — required path to the file
+  \end{itemize}
+  \item \textbf{Returns:} JSON map of block number to hex string content
+\end{itemize}
+\hrule\vspace{2em}
+
+
+
+\section{API Response Examples}
+
+\subsection*{\texttt{/blocks} — Example Response}
+\begin{verbatim}
+{
+  "0": "2320456e61626c6520506f7765726c6576656c31306b20696e7374616e742070726f6d70742e...",
+  "1": "207468656d6520656163682074696d65206f682d6d792d7a7368206973206c6f616465642c...",
+  "2": "20556e636f6d6d656e742074686520666f6c6c6f77696e67206c696e6520746f2075736520..."
+}
+\end{verbatim}
+
+\subsection*{\texttt{/disks} — Example Response}
+\begin{verbatim}
+[
+  {
+    "name": "/dev/nvme0n1",
+    "capacity_gb": 476.94
+  },
+  {
+    "name": "/dev/sda",
+    "capacity_gb": 7.68
+  }
+]
+\end{verbatim}
+
+\subsection*{\texttt{/partitions} — Example Response}
+\begin{verbatim}
+[
+  {
+    "name": "/dev/nvme0n1p1",
+    "fs_type": "vfat",
+    "mount_point": "/mnt/nvme0n1p1",
+    "size": "260M",
+    "fs_size": "256M",
+    "fs_used": "90,5M",
+    "uuid": "761A-740F",
+    "part_type_name": "EFI System",
+    "physical_sector_size": 512,
+    "logical_sector_size": 512
+  },
+  ...
+]
+\end{verbatim}
+
+\newpage
+
+\subsection*{\texttt{/files} — Example Response}
+\begin{verbatim}
+{
+  "mount_path": "/",
+  "files": [
+    {
+      "name": "bin",
+      "type": "symlink",
+      "is_symlink": true,
+      "size_bytes": 7,
+      "permissions": "Lrwxrwxrwx",
+      "hard_links": 1,
+      "inode": 13,
+      "owner_uid": 0,
+      "owner_gid": 0,
+      "block_size": 4096,
+      "blocks_allocated": 0,
+      "last_modified": "2024-11-21 09:56:21",
+      "last_access": "2025-03-12 00:05:56"
+    },
+    {
+      "name": "boot",
+      "type": "directory",
+      "is_symlink": false,
+      "size_bytes": 4096,
+      "permissions": "drwxr-xr-x",
+      "hard_links": 5,
+      "inode": 1,
+      "owner_uid": 0,
+      "owner_gid": 0,
+      "block_size": 4096,
+      "blocks_allocated": 8,
+      "last_modified": "Unknown",
+      "last_access": "Unknown"
+    },
+    ...
+  ]
+}
+\end{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
